@@ -5,12 +5,12 @@ import type { VercelRequest, VercelResponse } from '@vercel/node'
 // 日期
 function convertDateStatement(calendar: Calendar): string {
   const { animal, monthCn, dayCn, cMonth, cDay, ncWeek, term } = calendar
-  return `今日${cMonth}月${cDay}号${ncWeek}，农历${animal}年${monthCn}${dayCn}${term ? `，${term}` : ''}，祝您生活愉快，平安喜乐`
+  return `${cMonth}月${cDay}号${ncWeek}，农历${animal}年${monthCn}${dayCn}${term ? `，${term}` : ''}，祝您生活愉快，平安喜乐`
 }
 // 天气
 function convertWeatherStatement(weather: Weather): string {
-  const { city, detail } = weather
-  return `${city}${detail.text_day}${detail.text_day === detail.text_night ? '' : '转' + detail.text_night}，${detail.low} ~ ${detail.high}℃，${detail.wind_direction}${detail.wind_scale}级`
+  const { city, weatherOf, detail: { text_day, text_night, low, high, wind_direction, wind_scale } } = weather
+  return `${weatherOf === 'tommorrow' ? '明日' : '今日' }${city}${text_day}${text_day === text_night ? '' : '转' + text_night}，${low} ~ ${high}℃，${wind_direction}${wind_scale}级`
 }
 // 历史上的今天
 function convertHistoryList(historyList: HistoryList[]):  HistoryList[] {
@@ -32,7 +32,7 @@ function convertPhrase(phrase: Phrase): Phrase {
 }
 async function getNews() {
   const {data: {code, data}} = await axios.get(
-    'https://news.topurl.cn/api?count=10'
+    'https://news.topurl.cn/api?ip=112.20.118.37&count=10'
   )
   if (code === 200) {
     const weatherStatement = convertWeatherStatement(data.weather)
@@ -40,6 +40,7 @@ async function getNews() {
     const historyList = convertHistoryList(data.historyList)
     const phrase = convertPhrase(data.phrase) 
     return {
+      ...data,
       weatherStatement,
       dateStatement,
       phrase,
@@ -141,17 +142,7 @@ async function sendMessage(data: {
   )
   return content
 }
-async function main() {
-  if (!process.env.NEWS_WECHAT_WEBHOOK_URL) console.error('请设置环境变量NEWS_WECHAT_WEBHOOK_URL: 企业微信群机器人地址')
-  const data = await getNews()
-  const progress = calculateElapsedTimePercentageThisYear(14)
-  data && sendMessage({
-    ...data,
-    progress,
-  })
-}
 
-// main()
 export default async function (req: VercelRequest, res: VercelResponse) {
   if (!process.env.NEWS_WECHAT_WEBHOOK_URL) {
     console.error('请设置环境变量NEWS_WECHAT_WEBHOOK_URL: 企业微信群机器人地址');
@@ -176,7 +167,10 @@ export default async function (req: VercelRequest, res: VercelResponse) {
       progress,
     });
 
-    res.status(200).json(message);
+    res.status(200).json({
+      ...message,
+      data,
+    });
   } else {
     res.status(500).send('Internal Server Error')
   }
