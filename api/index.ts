@@ -154,7 +154,7 @@ async function main() {
 export default async function (req: VercelRequest, res: VercelResponse) {
   if (!process.env.NEWS_WECHAT_WEBHOOK_URL) {
     console.error('请设置环境变量NEWS_WECHAT_WEBHOOK_URL: 企业微信群机器人地址');
-    return res.status(500).send('Internal Server Error'+ process.env.NEWS_WECHAT_WEBHOOK_URL);
+    return res.status(500).send('Internal Server Error');
   }
 
   const data = await getNews();
