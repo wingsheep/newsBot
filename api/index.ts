@@ -139,6 +139,7 @@ async function sendMessage(data: {
     process.env.NEWS_WECHAT_WEBHOOK_URL,
     content
   )
+  return content
 }
 async function main() {
   if (!process.env.NEWS_WECHAT_WEBHOOK_URL) console.error('请设置环境变量NEWS_WECHAT_WEBHOOK_URL: 企业微信群机器人地址')
@@ -156,19 +157,28 @@ export default async function (req: VercelRequest, res: VercelResponse) {
     console.error('请设置环境变量NEWS_WECHAT_WEBHOOK_URL: 企业微信群机器人地址');
     return res.status(500).send('Internal Server Error');
   }
+  let hasAccess = false
+  // 检查请求是否来自Cron
+  if (req.headers['x-vercel-event-type'] === 'scheduled') {
+    hasAccess = true
+  } else {
+    // 检查请求头中的Authorization字段是否包含有效的鉴权令牌
+    hasAccess = req.headers.authorization === `Bearer ${process.env.NEWS_WECHAT_WEBHOOK_URL}`
+  }
+  !hasAccess && res.status(401).json({ message: 'Unauthorized' })
 
   const data = await getNews();
-  const progress = calculateElapsedTimePercentageThisYear(14);
+  const progress = calculateElapsedTimePercentageThisYear(14)
 
   if (data) {
-    await sendMessage({
+    const message = await sendMessage({
       ...data,
       progress,
     });
 
-    res.status(200).send('Message sent successfully');
+    res.status(200).json(message);
   } else {
-    res.status(500).send('Internal Server Error');
+    res.status(500).send('Internal Server Error')
   }
 }
 
