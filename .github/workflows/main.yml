@@ -21,9 +21,10 @@ jobs:
         node-version: 18
 
     - name: Install dependencies
-      run: npm install  # 或者使用 yarn，具体取决于你的项目
+      run: npm install
 
     - name: Run JavaScript script
+      env:
+        NEWS_WECHAT_WEBHOOK_URL: ${{ secrets.CONEWS_WECHAT_WEBHOOK_URLOKIE }}
       run: |
-        # 运行你的 JavaScript 脚本的命令
-        npm run start ${{ secrets.NEWS_WECHAT_WEBHOOK_URL }}
+        npm run start
