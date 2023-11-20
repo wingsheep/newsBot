@@ -18,9 +18,9 @@ jobs:
         node-version: 18
 
     - name: Install dependencies
-      run: pnpm install  # 或者使用 yarn，具体取决于你的项目
+      run: npm install  # 或者使用 yarn，具体取决于你的项目
 
     - name: Run JavaScript script
       run: |
         # 运行你的 JavaScript 脚本的命令
-        pnpm run start ${{ secrets.NEWS_WECHAT_WEBHOOK_URL }}
+        npm run start ${{ secrets.NEWS_WECHAT_WEBHOOK_URL }}
