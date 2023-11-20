@@ -1,7 +1,5 @@
 # 企业微信群聊天-每日简报推送脚本
 
-部署vercel serverless
-
 ## Configuration
 `process.env.NEWS_WECHAT_WEBHOOK_URL` 企业微信群机器人地址
 ```sh
