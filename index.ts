@@ -115,7 +115,7 @@ async function sendMessage(data: {
     markdown += `${item}\n`
   })
   markdown += `\n`
-  markdown += `> <font color="info">天天成语</font>\n`
+  markdown += `> <font color="info">天天成语</font> [🔡](https://handle.antfu.me/)\n`
   markdown += `${data.phrase.phrase}\n`
   markdown += data.phrase.explain && `释义：${data.phrase.explain}\n`
   markdown += data.phrase.from && `出处：${data.phrase.from}\n`
