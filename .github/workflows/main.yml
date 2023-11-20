@@ -25,6 +25,6 @@ jobs:
 
     - name: Run JavaScript script
       env:
-        NEWS_WECHAT_WEBHOOK_URL: ${{ secrets.CONEWS_WECHAT_WEBHOOK_URLOKIE }}
+        NEWS_WECHAT_WEBHOOK_URL: ${{ secrets.NEWS_WECHAT_WEBHOOK_URL }}
       run: |
         npm run start
