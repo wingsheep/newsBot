@@ -117,15 +117,6 @@ async function getnextDays() {
   return data.data
 }
 
-// 获取今天是否是工作日
-async function getWork() {
-  const today = dayjs().format('YYYY-MM-DD')
-  const { data } = await axios.get(
-    `https://date.appworlds.cn/work?date=${today}`
-  )
-  console.log(data)
-  return data.work
-}
 // 获取明天是否是工作日
 async function getWorkTomorrow() {
   const tomorrow = dayjs().add(1, 'day').format('YYYY-MM-DD')
@@ -145,33 +136,42 @@ async function getWorkTomorrow() {
     13: "希望你在休息日能够找到内心的宁静和平衡，让自己重拾活力和动力！",
     14: "愿你的休息日充满欢笑和快乐，让每一刻都值得回味和珍藏！",
   }
-  const { data } = await axios.get(
-    `https://date.appworlds.cn/work?date=${tomorrow}`
-  )
-  console.log(data)
-  return {
-    isWorkTomorrow: data.data.work,
-    greeting: goodSentenceMap[Math.floor(Math.random() * 14) + 1]
+  try {   
+    const { data: {code, data} } = await axios.get(
+      `https://date.appworlds.cn/work?date=${tomorrow}`
+    )
+    if (code === 200) {
+      return {
+        isWorkTomorrow: data.work,
+        greeting: goodSentenceMap[Math.floor(Math.random() * 14) + 1]
+      }
+    }
+  } catch (error) {
+    console.log(error)
   }
 }
 // 获取工作日天数
 async function getWorkDays() {
   const startDate = dayjs().startOf('year').format('YYYY-MM-DD')
   const endDate = dayjs().format('YYYY-MM-DD')
-  const { data } = await axios.get(
+  const { data: {code, data} } = await axios.get(
     `https://date.appworlds.cn/work/days?startDate=${startDate}&endDate=${endDate}`
   )
-  console.log(data)
-  return data.data
+  if (code === 200) {
+    return data
+  }
 }
 
 // 获取节假日信息
 async function getHolidayInfo() {
+  // 免费用户接口访问频率为1次/秒!(appworlds.cn)
   const nextHoliday = await getNextHoliday()
+  await new Promise(resolve => setTimeout(resolve, 600));
   const nextDays = await getnextDays()
+  await new Promise(resolve => setTimeout(resolve, 600));
   const workTomorrow = await getWorkTomorrow()
+  await new Promise(resolve => setTimeout(resolve, 600));
   const workDays = await getWorkDays()
-  console.log(workTomorrow)
   return {
     ...nextHoliday,
     nextDays,
