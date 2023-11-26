@@ -145,9 +145,16 @@ async function getWorkTomorrow() {
         isWorkTomorrow: data.work,
         greeting: goodSentenceMap[Math.floor(Math.random() * 14) + 1]
       }
+    } else {
+      return {
+        isWorkTomorrow: true,
+      }
     }
   } catch (error) {
     console.log(error)
+    return {
+      isWorkTomorrow: true,
+    }
   }
 }
 // 获取工作日天数
@@ -242,7 +249,7 @@ async function sendMessage(data: {
   if (!data.holidayInfo.isWorkTomorrow) {
     markdown +=`> 明日休息, ${data.holidayInfo.greeting}\n`
   }
-  markdown += `珍惜当下，享受此刻的美好!🌸`
+  markdown += `> 珍惜当下，享受此刻的美好!🌸`
   const content = {
     msgtype: "markdown",
     markdown: {
